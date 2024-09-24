@@ -76,23 +76,29 @@ subroutine construct_horizons_api_url(object,url,ierr)
  ierr = 0
  select case(trim(adjustl(object)))
  case('pluto')
-    cmd = '999' ! pluto barycentre
+    cmd = '999'   ! pluto barycentre
  case('neptune')
-    cmd = '899' ! neptune barycentre
+    cmd = '899'   ! neptune barycentre
  case('uranus')
-    cmd = '799' ! uranus barycentre
+    cmd = '799'   ! uranus barycentre
  case('saturn')
-    cmd = '699' ! saturn barycentre
+    cmd = '699'   ! saturn barycentre
  case('jupiter')
-    cmd = '599' ! jupiter barycentre
+    cmd = '599'   ! jupiter barycentre
  case('mars')
-    cmd = '499' ! mars barycentre
+    cmd = '499'   ! mars barycentre
  case('earth')
-    cmd = '399' ! earth-moon barycentre
+    cmd = '399'   ! earth
  case('venus')
-    cmd = '299' ! venus barycentre
+    cmd = '299'   ! venus barycentre
  case('mercury')
-    cmd = '199' ! mercury barycentre
+    cmd = '199'   ! mercury barycentre
+ case('moon')
+    cmd = '301'   ! moon
+ case('apophis')
+    cmd = '99942' ! 99942 Apophis
+ case('sun')   
+    cmd = '10'    ! sun barycentre
  case default
     ierr = 1
  end select
