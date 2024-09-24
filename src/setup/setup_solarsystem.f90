@@ -178,7 +178,7 @@ end subroutine setpart
 subroutine set_solarsystem_planets(nptmass,xyzmh_ptmass,vxyz_ptmass)
  use ephemeris, only:get_ephemeris,nelem
  use units,     only:umass,udist
- use physcon,   only:gg,km,solarm,earthm,au
+ use physcon,   only:gg,km,solarm,earthm,au,apophm
  use setbinary, only:set_binary
  integer, intent(inout) :: nptmass
  real,    intent(inout) :: xyzmh_ptmass(:,:),vxyz_ptmass(:,:)
@@ -187,12 +187,12 @@ subroutine set_solarsystem_planets(nptmass,xyzmh_ptmass,vxyz_ptmass)
      (/'mercury', &
        'venus  ', &
        'earth  ', &
+       'apophis', &
        'mars   ', &
        'jupiter', &
        'saturn ', &
        'uranus ', &
-       'neptune', &
-       'pluto  '/)  ! for nostalgia's sake
+       'neptune' /)  ! 'pluto  ' for nostalgia's sake
  real    :: elems(nelem),xyz_tmp(size(xyzmh_ptmass(:,1)),2),vxyz_tmp(3,2),gm_cgs
  real    :: msun,mplanet,a,e,inc,O,w,f
  integer :: i,ierr,ntmp
@@ -204,8 +204,11 @@ subroutine set_solarsystem_planets(nptmass,xyzmh_ptmass,vxyz_ptmass)
        print "(a)",' ERROR: could not read ephemeris data for '//planet_name(i)
        cycle  ! skip if error reading ephemeris file
     endif
+
     gm_cgs  = elems(1)*km**3
     mplanet = (gm_cgs/gg)/umass
+   ! mplanet = apophm / umass
+
     a   = elems(2)*km/udist
     e   = elems(3)
     inc = elems(4)
