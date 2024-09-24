@@ -69,7 +69,7 @@ subroutine construct_horizons_api_url(object,url,ierr)
  character(len=*), intent(in)  :: object  ! name of the solar system object
  character(len=*), intent(out) :: url     ! url for query
  integer,          intent(out) :: ierr
- character(len=3)  :: cmd
+ character(len=10) :: cmd
  character(len=10) :: start_epoch,end_epoch
  integer           :: values(8),year,month,day
 
