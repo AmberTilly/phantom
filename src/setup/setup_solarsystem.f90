@@ -187,12 +187,12 @@ subroutine set_solarsystem_planets(nptmass,xyzmh_ptmass,vxyz_ptmass)
      (/'mercury', &
        'venus  ', &
        'earth  ', &
-       'apophis', &
        'mars   ', &
        'jupiter', &
        'saturn ', &
        'uranus ', &
-       'neptune' /)  ! 'pluto  ' for nostalgia's sake
+       'neptune', &
+       'apophis' /)  !  for nostalgia's sake  
  real    :: elems(nelem),xyz_tmp(size(xyzmh_ptmass(:,1)),2),vxyz_tmp(3,2),gm_cgs
  real    :: msun,mplanet,a,e,inc,O,w,f
  integer :: i,ierr,ntmp
@@ -207,7 +207,6 @@ subroutine set_solarsystem_planets(nptmass,xyzmh_ptmass,vxyz_ptmass)
 
     gm_cgs  = elems(1)*km**3
     mplanet = (gm_cgs/gg)/umass
-   ! mplanet = apophm / umass
 
     a   = elems(2)*km/udist
     e   = elems(3)
@@ -229,6 +228,75 @@ subroutine set_solarsystem_planets(nptmass,xyzmh_ptmass,vxyz_ptmass)
 
 end subroutine set_solarsystem_planets
 
+!----------------------------------------------------------------
+!+
+!  setup other solar system objects by querying their ephemeris
+!  from the JPL server
+!+
+!----------------------------------------------------------------
+! subroutine set_solarsystem_objects(nptmass,xyzmh_ptmass,vxyz_ptmass)
+!    use ephemeris, only:get_ephemeris,nelem
+!    use units,     only:umass,udist
+!    use physcon,   only:gg,km,solarm,earthm,au,apophm
+!    use setbinary, only:set_binary
+!    integer, intent(inout) :: nptmass
+!    real,    intent(inout) :: xyzmh_ptmass(:,:),vxyz_ptmass(:,:)
+!    integer,          parameter :: nobjects = 2
+!    character(len=*), parameter :: object_name(nobjects) = &
+!        (/'apophis', & ! 'sun    ', &
+!          'moon   ' /)
+!    real    :: elems(nelem),xyz_tmp(size(xyzmh_ptmass(:,1)),2),vxyz_tmp(3,2),gm_cgs
+!    real    :: msun,mobject,a,e,inc,O,w,f
+!    integer :: i,ierr,ntmp
+  
+!    msun = solarm/umass
+!    do i=1,nobjects
+!       ! if (object_name(i) == 'sun') then
+
+!       !    if (ierr /= 0) then
+!       !       print "(a)",' ERROR: could not read ephemeris data for '//object_name(i)
+!       !       cycle  ! skip if error reading ephemeris file
+!       !    endif 
+!       if (object_name(i) == 'apophis') then
+
+!          if (ierr /= 0) then
+!             print "(a)",' ERROR: could not read ephemeris data for '//object_name(i)
+!             cycle  ! skip if error reading ephemeris file
+!          endif
+!       else ! moon
+!          elems = get_ephemeris(object_name(i),ierr)
+!          if (ierr /= 0) then
+!             print "(a)",' ERROR: could not read ephemeris data for '//object_name(i)
+!             cycle  ! skip if error reading ephemeris file
+!          endif
+!       endif
+
+!       gm_cgs  = elems(1)*km**3
+!       mobject = (gm_cgs/gg)/umass
+
+!      ! mplanet = apophm / umass
+  
+!       a   = elems(2)*km/udist
+!       e   = elems(3)
+!       inc = elems(4)
+!       O   = elems(5)
+!       w   = elems(6)
+!       f   = elems(7)
+
+!       print*,' mobject/mearth = ',mobject*umass/earthm,' a = ',a*udist/au,' au'
+!       ntmp = 0
+!       call set_binary(msun,mobject,a,e,0.01,0.01,&
+!                       xyz_tmp,vxyz_tmp,ntmp,ierr,incl=inc,&
+!                       arg_peri=w,posang_ascnode=O,f=f,verbose=.false.)
+!       nptmass = nptmass + 1
+!       xyzmh_ptmass(:,nptmass) = xyz_tmp(:,2)
+!       vxyz_ptmass(:,nptmass)  = vxyz_tmp(:,2)
+!    enddo
+  
+!    print*,' nptmass = ',nptmass
+  
+!   end subroutine set_solarsystem_objects
+  
 !----------------------------------------------------------------
 !+
 !  write setup parameters to file

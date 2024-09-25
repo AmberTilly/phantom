@@ -130,14 +130,15 @@ subroutine read_ephemeris_file(file,elems,ierr)
  integer, intent(out) :: ierr
  integer :: iu,j
  character(len=80)  :: line
+ integer :: tag_pos(nelem)
  character(len=*), parameter :: tag(nelem) = &
-    (/'GM km^3/s^2',&
-      'A          ',&
-      'EC         ',&
-      'IN         ',&
-      'OM         ',&
-      'W          ',&
-      'TA         '/)
+    (/'GM km^3/s^2',&       
+      'A          ',&       ! Semi-major axis, a (km)
+      'EC         ',&       ! Eccentricity, e
+      'IN         ',&       ! Inclination w.r.t X-Y plane, i (degrees)
+      'OM         ',&       ! Longitude of Ascending Node, OMEGA, (degrees)
+      'W          ',&       ! Argument of Perifocus, w (degrees)
+      'TA         '/)       ! True anomaly, nu (degrees)
  logical :: got_elem(nelem)
 
  ! give default parameters
@@ -150,11 +151,12 @@ subroutine read_ephemeris_file(file,elems,ierr)
     return
  endif
  print "(/,a)",' > reading ephemeris from '//trim(file)
+
  do while(ierr == 0)
     read(iu,"(a)",iostat=ierr) line
     do j=1,nelem
        if (.not.got_elem(j)) then
-          call read_value(line,tag(j),elems(j),got_elem(j))
+          call read_value(line,tag(j),elems(j),got_elem(j), tag_pos(j))
        endif
     enddo
  enddo
@@ -175,11 +177,13 @@ end subroutine read_ephemeris_file
 !  utility routine to read a var = blah string from the ephemeris file
 !+
 !-----------------------------------------------------------------------
-subroutine read_value(line,tag,val,got_val)
+subroutine read_value(line,tag,val,got_val,tag_pos)
  use fileutils, only:string_delete,string_replace
+ use physcon,   only:apophm
  character(len=*), intent(in)    :: line, tag
  real,             intent(out)   :: val
  logical,          intent(inout) :: got_val
+ integer, intent(inout) :: tag_pos
  character(len=len(line)) :: string
  integer :: ieq,j,ierr
 
@@ -189,7 +193,7 @@ subroutine read_value(line,tag,val,got_val)
     string = line
 
     call string_delete(string,'(planet)') ! pluto has GM(planet) km^3/s^2
-
+    call string_replace(string,'Keplerian GM    : ', 'GM km^3/s^2  = ') ! Apophis: Keplerian GM
     ! delete double spaces
     call string_replace(string,'  ',' ')
     call string_delete(string,'(')
@@ -212,6 +216,7 @@ subroutine read_value(line,tag,val,got_val)
           ! mark this quantity as having already been read
           write(*,"(1x,a,g0)",advance='no') trim(tag)//' = ',val
           got_val = .true.
+          tag_pos = j 
        endif
     endif
  endif
